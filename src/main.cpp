@@ -9,19 +9,7 @@
 
 #include "body.hpp"
 #include "simulation.hpp"
-
-constexpr int WIDTH = 1000;
-constexpr int HEIGHT = 1000;
-
-Vec2 worldToScreen(Vec2 position)
-{
-    Vec2 screen_position{};
-
-    screen_position.x = position.x * 10;
-    screen_position.y = HEIGHT - position.y * 10;
-
-    return screen_position;
-}
+#include "util.hpp"
 
 int main()
 {

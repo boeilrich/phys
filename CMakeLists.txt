@@ -11,6 +11,7 @@ add_executable(${PROJECT_NAME}
     src/main.cpp
     src/body.cpp
     src/simulation.cpp
+    src/util.cpp
 )
 
 #===================

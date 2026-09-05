@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "body.hpp"
-#include "main.hpp"
+#include "util.hpp"
 
 void Simulation::tick()
 {

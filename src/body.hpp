@@ -1,6 +1,6 @@
 #pragma once
 
-#include "main.hpp"
+#include "util.hpp"
 
 class Body
 {
@@ -10,7 +10,6 @@ class Body
 
     Vec2 position_{};
     Vec2 velocity_{};
-
     Vec2 accumulated_acceleration_{};
 
   public:
