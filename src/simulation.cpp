@@ -22,7 +22,7 @@ void Simulation::tick()
 
             double distance = std::sqrt(std::pow(delta.x, 2) + std::pow(delta.y, 2));
 
-            if (distance < 2)
+            if (distance < (*body1).getRadius() + (*body2).getRadius())
                 continue;
 
             delta_normalized.x = delta.x / distance;
@@ -40,13 +40,10 @@ void Simulation::tick()
     }
 }
 
-Simulation::Simulation(unsigned long body_count)
+Simulation::Simulation()
 {
-    bodies_.reserve(body_count);
-
-    for (unsigned long i = 0; i < body_count; i++) {
-        bodies_.emplace_back();
-    }
+    bodies_.emplace_back(Vec2{.x = 200, .y = 500}, 200000000, 20);
+    bodies_.emplace_back(Vec2{.x = 800, .y = 500}, 200000000, 20);
 
     for (auto body1 = bodies_.begin(); body1 != bodies_.end(); ++body1) {
         for (auto body2 = bodies_.begin(); body2 != bodies_.end(); ++body2) {
@@ -62,7 +59,7 @@ Simulation::Simulation(unsigned long body_count)
 
             double distance = std::sqrt(std::pow(delta.x, 2) + std::pow(delta.y, 2));
 
-            if (distance < 2)
+            if (distance < (*body1).getRadius() + (*body2).getRadius())
                 continue;
 
             delta_normalized.x = delta.x / distance;
@@ -71,7 +68,13 @@ Simulation::Simulation(unsigned long body_count)
             double force = GRAVITATIONAL_CONSTANT * ((*body1).getMass() * (*body2).getMass()) / distance;
 
             (*body2).bootstrapVelocity({.x = delta_normalized.x * force, .y = delta_normalized.y * force}, delta_time_);
-            (*body1).bootstrapVelocity({.x = delta_normalized.x * force, .y = delta_normalized.y * force}, delta_time_);
+            (*body1).bootstrapVelocity({.x = -delta_normalized.x * force, .y = -delta_normalized.y * force},
+                                       delta_time_);
         }
     }
+}
+
+const std::vector<Body>& Simulation::getBodies()
+{
+    return bodies_;
 }

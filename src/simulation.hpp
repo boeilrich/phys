@@ -14,6 +14,7 @@ class Simulation
 
   public:
     void tick();
+    const std::vector<Body>& getBodies();
 
-    Simulation(unsigned long body_count);
+    Simulation();
 };

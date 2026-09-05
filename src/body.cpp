@@ -2,6 +2,10 @@
 
 #include "main.hpp"
 
+Body::Body(Vec2 position, double mass, double radius) : mass_(mass), radius_(radius), position_(position)
+{
+}
+
 Vec2 Body::calculateCurrentAcceleration()
 {
     Vec2 acceleration{};
@@ -40,6 +44,11 @@ void Body::bootstrapVelocity(Vec2 acceleration, double delta_time)
 double Body::getMass()
 {
     return mass_;
+}
+
+double Body::getRadius()
+{
+    return radius_;
 }
 
 Vec2 Body::getPosition()
