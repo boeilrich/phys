@@ -2,6 +2,9 @@
 
 #include <vector>
 
+#include <glm/ext/vector_double2.hpp>
+
+#include "aabb.hpp"
 #include "body.hpp"
 
 constexpr double GRAVITATIONAL_CONSTANT = 0.0000000000667430;
@@ -12,10 +15,14 @@ class Simulation
   private:
     std::vector<Body> bodies_;
 
+    AABoundingBox area_{glm::dvec2(0.0, 0.0), 80, 80};
+
   public:
     void tick();
 
     void addBody(Body body);
+
+    const AABoundingBox& getBoundingBox();
 
     const std::vector<Body>& getBodies() const noexcept;
 };

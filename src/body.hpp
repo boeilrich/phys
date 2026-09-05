@@ -1,6 +1,6 @@
 #pragma once
 
-#include "util.hpp"
+#include <glm/ext/vector_double2.hpp>
 
 class Body
 {
@@ -8,22 +8,22 @@ class Body
     double mass_;
     double radius_;
 
-    Vec2 position_{};
-    Vec2 velocity_{};
-    Vec2 accumulated_acceleration_{};
+    glm::dvec2 position_{};
+    glm::dvec2 velocity_{};
+    glm::dvec2 accumulated_acceleration_{};
 
   public:
-    Body(Vec2 position, double mass, double radius);
+    Body(glm::dvec2 position, double mass, double radius);
 
     void tick();
-    void applyAcceleration(Vec2 acceleration);
-    void applyForce(Vec2 force);
+    void applyAcceleration(glm::dvec2 acceleration);
+    void applyForce(glm::dvec2 force);
 
-    void setVelocity(Vec2 velocity);
-    void setPosition(Vec2 position);
+    void setVelocity(glm::dvec2 velocity);
+    void setPosition(glm::dvec2 position);
 
     double getMass() const noexcept;
     double getRadius() const noexcept;
-    Vec2 getPosition() const noexcept;
-    Vec2 getVelocity() const noexcept;
+    glm::dvec2 getPosition() const noexcept;
+    glm::dvec2 getVelocity() const noexcept;
 };

@@ -12,6 +12,7 @@ add_executable(${PROJECT_NAME}
     src/body.cpp
     src/simulation.cpp
     src/util.cpp
+    src/aabb.cpp
 )
 
 #===================
@@ -58,5 +59,6 @@ target_compile_definitions(${PROJECT_NAME}
     $<$<CONFIG:Debug>:${PROJECT_NAME_UPPER}_DEBUG>
 )
 
+find_package(glm REQUIRED)
 find_package(raylib REQUIRED)
-target_link_libraries(${PROJECT_NAME} raylib)
+target_link_libraries(${PROJECT_NAME} glm raylib)

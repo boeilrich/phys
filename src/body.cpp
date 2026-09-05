@@ -1,42 +1,37 @@
 #include "body.hpp"
 
-#include "main.hpp"
+#include <glm/ext/vector_double2.hpp>
+
 #include "simulation.hpp"
 
-Body::Body(Vec2 position, double mass, double radius) : mass_(mass), radius_(radius), position_(position)
+Body::Body(glm::dvec2 position, double mass, double radius) : mass_(mass), radius_(radius), position_(position)
 {
 }
 
 void Body::tick()
 {
-    velocity_.x += accumulated_acceleration_.x * TIMESTEP;
-    velocity_.y += accumulated_acceleration_.y * TIMESTEP;
+    velocity_ += accumulated_acceleration_ * TIMESTEP;
+    accumulated_acceleration_ = {};
 
-    accumulated_acceleration_.x = 0;
-    accumulated_acceleration_.y = 0;
-
-    position_.x += velocity_.x * TIMESTEP;
-    position_.y += velocity_.y * TIMESTEP;
+    position_ += velocity_ * TIMESTEP;
 }
 
-void Body::applyAcceleration(Vec2 acceleration)
+void Body::applyAcceleration(glm::dvec2 acceleration)
 {
-    accumulated_acceleration_.x += acceleration.x;
-    accumulated_acceleration_.y += acceleration.y;
+    accumulated_acceleration_ += acceleration;
 }
 
-void Body::applyForce(Vec2 force)
+void Body::applyForce(glm::dvec2 force)
 {
-    accumulated_acceleration_.x += force.x / mass_;
-    accumulated_acceleration_.y += force.y / mass_;
+    accumulated_acceleration_ += force / mass_;
 }
 
-void Body::setVelocity(Vec2 velocity)
+void Body::setVelocity(glm::dvec2 velocity)
 {
     velocity_ = velocity;
 }
 
-void Body::setPosition(Vec2 position)
+void Body::setPosition(glm::dvec2 position)
 {
     position_ = position;
 }
@@ -51,12 +46,12 @@ double Body::getRadius() const noexcept
     return radius_;
 }
 
-Vec2 Body::getPosition() const noexcept
+glm::dvec2 Body::getPosition() const noexcept
 {
     return position_;
 }
 
-Vec2 Body::getVelocity() const noexcept
+glm::dvec2 Body::getVelocity() const noexcept
 {
     return velocity_;
 }

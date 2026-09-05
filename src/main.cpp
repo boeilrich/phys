@@ -5,6 +5,7 @@
 #include <thread>
 #include <vector>
 
+#include <glm/ext/vector_double2.hpp>
 #include <raylib.h>
 
 #include "body.hpp"
@@ -15,8 +16,11 @@ int main()
 {
     Simulation* simulation = new Simulation();
 
-    Body body1(Vec2{.x = 20, .y = 20}, 1, 1);
-    Body body2(Vec2{.x = 80, .y = 20}, 10, 10);
+    Body body1(glm::dvec2(-20.0, 20.0), 1, 1);
+    Body body2(glm::dvec2(+20.0, 20.0), 5, 5);
+
+    body1.applyAcceleration(glm::dvec2(500.0, 0.0));
+    body2.applyAcceleration(glm::dvec2(-500.0, 0.0));
 
     simulation->addBody(body1);
     simulation->addBody(body2);
@@ -28,14 +32,16 @@ int main()
         const std::vector<Body>& bodies = simulation->getBodies();
 
         BeginDrawing();
-        ClearBackground(RAYWHITE);
+        ClearBackground(BLACK);
         for (auto body : bodies) {
             std::println("Position: {}, {}", body.getPosition().x, body.getPosition().y);
 
-            Vec2 screen_position = worldToScreen(body.getPosition());
+            glm::dvec2 screen_position = worldToScreen(body.getPosition());
             DrawCircle(static_cast<int>(screen_position.x), static_cast<int>(screen_position.y),
                        static_cast<float>(body.getRadius() * 10), RED);
         }
+
+        simulation->getBoundingBox().debugDraw(GREEN);
 
         EndDrawing();
 
