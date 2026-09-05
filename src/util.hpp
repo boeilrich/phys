@@ -2,7 +2,7 @@
 
 #include <glm/ext/vector_double2.hpp>
 
-constexpr double SCALING_FACTOR = 10.0;
+constexpr double PIXELS_PER_METER = 50.0;
 constexpr int WIDTH = 1000;
 constexpr int HEIGHT = 1000;
 

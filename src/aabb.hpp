@@ -25,6 +25,7 @@ class AABoundingBox
   public:
     AABoundingBox(glm::dvec2 position, double width, double height);
     bool isCollidingAABB(const AABoundingBox& other);
+
     std::optional<Side> findBodyCrossingSide(const Body& body);
 
     void debugDraw(Color color) const noexcept;

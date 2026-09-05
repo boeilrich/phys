@@ -1,6 +1,7 @@
 #include "aabb.hpp"
 
 #include <optional>
+#include <print>
 
 #include <glm/ext/vector_double2.hpp>
 #include <raylib.h>
@@ -48,22 +49,13 @@ std::optional<Side> AABoundingBox::findBodyCrossingSide(const Body& body)
 void AABoundingBox::debugDraw(Color color) const noexcept
 {
     glm::dvec2 topLeft = worldToScreen(glm::dvec2(position_.x - width_ / 2.0, position_.y + height_ / 2.0));
-    glm::dvec2 topRight = worldToScreen(glm::dvec2(position_.x + width_ / 2.0, position_.y + height_ / 2.0));
-    glm::dvec2 bottomLeft = worldToScreen(glm::dvec2(position_.x - width_ / 2.0, position_.y - height_ / 2.0));
-    glm::dvec2 bottomRight = worldToScreen(glm::dvec2(position_.x + width_ / 2.0, position_.y - height_ / 2.0));
 
-    DrawLine(static_cast<int>(topLeft.x), static_cast<int>(topLeft.y), static_cast<int>(topRight.x),
-             static_cast<int>(topRight.y), color);
-    DrawLine(static_cast<int>(topRight.x), static_cast<int>(topRight.y), static_cast<int>(bottomRight.x),
-             static_cast<int>(bottomRight.y), color);
-    DrawLine(static_cast<int>(topLeft.x), static_cast<int>(topLeft.y), static_cast<int>(bottomLeft.x),
-             static_cast<int>(bottomLeft.y), color);
-    DrawLine(static_cast<int>(bottomLeft.x), static_cast<int>(bottomLeft.y), static_cast<int>(bottomRight.x),
-             static_cast<int>(bottomRight.y), color);
+    DrawRectangleLines(static_cast<int>(topLeft.x), static_cast<int>(topLeft.y),
+                       static_cast<int>(width_ * PIXELS_PER_METER), static_cast<int>(height_ * PIXELS_PER_METER),
+                       color);
 
     glm::dvec2 position = worldToScreen(position_);
-
-    DrawCircle(static_cast<int>(position.x), static_cast<int>(position.y), 2, RED);
+    DrawCircle(static_cast<int>(position.x), static_cast<int>(position.y), 2, BLUE);
 }
 
 void AABoundingBox::setPosition(glm::dvec2 position)

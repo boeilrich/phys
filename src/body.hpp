@@ -13,9 +13,11 @@ class Body
     glm::dvec2 accumulated_acceleration_{};
 
   public:
-    Body(glm::dvec2 position, double mass, double radius);
+    Body(glm::dvec2 position, double mass, double radius) : mass_(mass), radius_(radius), position_(position)
+    {
+    }
 
-    void tick();
+    void tick(double dt);
     void applyAcceleration(glm::dvec2 acceleration);
     void applyForce(glm::dvec2 force);
 

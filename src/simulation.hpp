@@ -15,7 +15,10 @@ class Simulation
   private:
     std::vector<Body> bodies_;
 
-    AABoundingBox area_{glm::dvec2(0.0, 0.0), 80, 80};
+    AABoundingBox area_{glm::dvec2(0.0, 0.0), 20, 20};
+
+    void processBoundaryConstraint(Body& body);
+    void processBodyCollisions();
 
   public:
     void tick();

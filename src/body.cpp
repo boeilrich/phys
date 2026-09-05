@@ -2,18 +2,12 @@
 
 #include <glm/ext/vector_double2.hpp>
 
-#include "simulation.hpp"
-
-Body::Body(glm::dvec2 position, double mass, double radius) : mass_(mass), radius_(radius), position_(position)
+void Body::tick(double dt)
 {
-}
-
-void Body::tick()
-{
-    velocity_ += accumulated_acceleration_ * TIMESTEP;
+    velocity_ += accumulated_acceleration_ * dt;
     accumulated_acceleration_ = {};
 
-    position_ += velocity_ * TIMESTEP;
+    position_ += velocity_ * dt;
 }
 
 void Body::applyAcceleration(glm::dvec2 acceleration)
