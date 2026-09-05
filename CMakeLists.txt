@@ -9,6 +9,8 @@ endif()
 
 add_executable(${PROJECT_NAME}
     src/main.cpp
+    src/body.cpp
+    src/simulation.cpp
 )
 
 #===================
@@ -55,3 +57,5 @@ target_compile_definitions(${PROJECT_NAME}
     $<$<CONFIG:Debug>:${PROJECT_NAME_UPPER}_DEBUG>
 )
 
+find_package(raylib REQUIRED)
+target_link_libraries(${PROJECT_NAME} raylib)
