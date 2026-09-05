@@ -1,57 +1,62 @@
 #include "body.hpp"
 
 #include "main.hpp"
+#include "simulation.hpp"
 
 Body::Body(Vec2 position, double mass, double radius) : mass_(mass), radius_(radius), position_(position)
 {
 }
 
-Vec2 Body::calculateCurrentAcceleration()
+void Body::tick()
 {
-    Vec2 acceleration{};
+    velocity_.x += accumulated_acceleration_.x * TIMESTEP;
+    velocity_.y += accumulated_acceleration_.y * TIMESTEP;
 
-    acceleration.x = force_.x / mass_;
-    acceleration.y = force_.y / mass_;
+    accumulated_acceleration_.x = 0;
+    accumulated_acceleration_.y = 0;
 
-    return acceleration;
+    position_.x += velocity_.x * TIMESTEP;
+    position_.y += velocity_.y * TIMESTEP;
 }
 
-void Body::leapfrogStep(double delta_time)
+void Body::applyAcceleration(Vec2 acceleration)
 {
-    Vec2 acceleration = calculateCurrentAcceleration();
-    force_.x = 0;
-    force_.y = 0;
-
-    velocity_.x = velocity_.x + acceleration.x * delta_time;
-    velocity_.y = velocity_.y + acceleration.y * delta_time;
-
-    position_.x = position_.x + velocity_.x * delta_time;
-    position_.y = position_.y + velocity_.y * delta_time;
+    accumulated_acceleration_.x += acceleration.x;
+    accumulated_acceleration_.y += acceleration.y;
 }
 
-void Body::addForce(Vec2 force)
+void Body::applyForce(Vec2 force)
 {
-    force_.x += force.x;
-    force_.y += force.y;
+    accumulated_acceleration_.x += force.x / mass_;
+    accumulated_acceleration_.y += force.y / mass_;
 }
 
-void Body::bootstrapVelocity(Vec2 acceleration, double delta_time)
+void Body::setVelocity(Vec2 velocity)
 {
-    velocity_.x = acceleration.x * delta_time / 2;
-    velocity_.y = acceleration.y * delta_time / 2;
+    velocity_ = velocity;
 }
 
-double Body::getMass()
+void Body::setPosition(Vec2 position)
+{
+    position_ = position;
+}
+
+double Body::getMass() const noexcept
 {
     return mass_;
 }
 
-double Body::getRadius()
+double Body::getRadius() const noexcept
 {
     return radius_;
 }
 
-Vec2 Body::getPosition()
+Vec2 Body::getPosition() const noexcept
 {
     return position_;
+}
+
+Vec2 Body::getVelocity() const noexcept
+{
+    return velocity_;
 }

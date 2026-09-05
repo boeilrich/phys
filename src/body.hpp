@@ -10,18 +10,21 @@ class Body
 
     Vec2 position_{};
     Vec2 velocity_{};
-    Vec2 force_{};
 
-    Vec2 calculateCurrentAcceleration();
+    Vec2 accumulated_acceleration_{};
 
   public:
     Body(Vec2 position, double mass, double radius);
 
-    void leapfrogStep(double delta_time);
-    void addForce(Vec2 force);
-    void bootstrapVelocity(Vec2 acceleration, double delta_time);
+    void tick();
+    void applyAcceleration(Vec2 acceleration);
+    void applyForce(Vec2 force);
 
-    double getMass();
-    double getRadius();
-    Vec2 getPosition();
+    void setVelocity(Vec2 velocity);
+    void setPosition(Vec2 position);
+
+    double getMass() const noexcept;
+    double getRadius() const noexcept;
+    Vec2 getPosition() const noexcept;
+    Vec2 getVelocity() const noexcept;
 };
