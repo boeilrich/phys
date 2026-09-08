@@ -1,9 +1,13 @@
 #include "simulation.hpp"
 
+#include <cmath>
+#include <numbers>
 #include <optional>
+#include <random>
 #include <vector>
 
 #include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_double3.hpp>
 #include <glm/geometric.hpp>
 #include <raylib.h>
 
@@ -109,6 +113,33 @@ void Simulation::processBodyCollisions()
 void Simulation::addBody(Body body)
 {
     bodies_.push_back(body);
+}
+
+void Simulation::addRandomBodies(unsigned int count)
+{
+    std::random_device r;
+
+    std::default_random_engine e1(r());
+
+    std::uniform_real_distribution<double> radius_distribution(0.1, 3);
+    std::uniform_real_distribution<double> acceleration_distribution(100, 500);
+    std::uniform_real_distribution<double> color_distribution(0.0, 1.0);
+
+    std::uniform_real_distribution<double> x_distribution(area_.getPosition().x - area_.getWidth(),
+                                                          area_.getPosition().x + area_.getWidth());
+
+    std::uniform_real_distribution<double> y_distribution(area_.getPosition().y - area_.getHeight(),
+                                                          area_.getPosition().y + area_.getHeight());
+
+    for (unsigned int i = 0; i < count; i++) {
+        double x = x_distribution(e1);
+        double y = y_distribution(e1);
+        double radius = radius_distribution(e1);
+
+        bodies_.emplace_back(glm::dvec2(x, y), std::pow(radius, 2) * std::numbers::pi, radius,
+                             glm::dvec3(color_distribution(e1), color_distribution(e1), color_distribution(e1)));
+        bodies_.back().applyAcceleration(glm::dvec2(acceleration_distribution(e1), acceleration_distribution(e1)));
+    }
 }
 
 const AABoundingBox& Simulation::getBoundingBox()

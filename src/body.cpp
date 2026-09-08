@@ -1,6 +1,7 @@
 #include "body.hpp"
 
 #include <glm/ext/vector_double2.hpp>
+#include <raylib.h>
 
 void Body::tick(double dt)
 {
@@ -48,4 +49,9 @@ glm::dvec2 Body::getPosition() const noexcept
 glm::dvec2 Body::getVelocity() const noexcept
 {
     return velocity_;
+}
+
+Color Body::getColor() const noexcept
+{
+    return color_;
 }

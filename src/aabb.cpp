@@ -1,7 +1,6 @@
 #include "aabb.hpp"
 
 #include <optional>
-#include <print>
 
 #include <glm/ext/vector_double2.hpp>
 #include <raylib.h>

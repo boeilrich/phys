@@ -24,6 +24,7 @@ class Simulation
     void tick();
 
     void addBody(Body body);
+    void addRandomBodies(unsigned int count);
 
     const AABoundingBox& getBoundingBox();
 

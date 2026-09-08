@@ -16,14 +16,7 @@ int main()
 {
     Simulation* simulation = new Simulation();
 
-    Body body1(glm::dvec2(-10.0, 10.0), 0.5, 0.5);
-    Body body2(glm::dvec2(+10.0, 10.0), 1.5, 1.5);
-
-    body1.applyAcceleration(glm::dvec2(500.0, 0.0));
-    body2.applyAcceleration(glm::dvec2(-500.0, 0.0));
-
-    simulation->addBody(body1);
-    simulation->addBody(body2);
+    simulation->addRandomBodies(10);
 
     InitWindow(WIDTH, HEIGHT, "phys");
 
@@ -37,8 +30,8 @@ int main()
             std::println("Position: {}, {}", body.getPosition().x, body.getPosition().y);
 
             glm::dvec2 screen_position = worldToScreen(body.getPosition());
-            DrawCircleLines(static_cast<int>(screen_position.x), static_cast<int>(screen_position.y),
-                            static_cast<float>(body.getRadius() * PIXELS_PER_METER), RED);
+            DrawCircle(static_cast<int>(screen_position.x), static_cast<int>(screen_position.y),
+                       static_cast<float>(body.getRadius() * PIXELS_PER_METER), body.getColor());
         }
 
         simulation->getBoundingBox().debugDraw(GREEN);
