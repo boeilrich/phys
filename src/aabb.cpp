@@ -3,6 +3,7 @@
 #include <optional>
 
 #include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_double4.hpp>
 #include <raylib.h>
 
 #include "body.hpp"
@@ -21,28 +22,19 @@ bool AABoundingBox::isCollidingAABB(const AABoundingBox& other)
            (position_.y + height_ / 2.0 >= other.position_.y - other.height_ / 2.0);
 }
 
-std::optional<Side> AABoundingBox::findBodyCrossingSide(const Body& body)
+glm::dvec4 AABoundingBox::findBodyCrossingError(const Body& body)
 {
     const auto position = body.getPosition();
     const auto radius = body.getRadius();
 
-    if (position.x - radius <= position_.x - width_ / 2.0) {
-        return Side::Left;
-    }
+    glm::dvec4 error{};
 
-    if (position.x + radius >= position_.x + width_ / 2.0) {
-        return Side::Right;
-    }
+    error.x = (position_.x - width_ / 2.0) - (position.x - radius);   // left side
+    error.y = (position.x + radius) - (position_.x + width_ / 2.0);   // right side
+    error.z = (position_.y - height_ / 2.0) - (position.y - radius);  // bottom side
+    error.w = (position.y + radius) - (position_.y + height_ / 2.0);  // top side
 
-    if (position.y - radius <= position_.y - height_ / 2.0) {
-        return Side::Bottom;
-    }
-
-    if (position.y + radius >= position_.y + height_ / 2.0) {
-        return Side::Top;
-    }
-
-    return std::nullopt;
+    return error;
 }
 
 void AABoundingBox::debugDraw(Color color) const noexcept

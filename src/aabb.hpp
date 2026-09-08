@@ -1,18 +1,10 @@
 #pragma once
 
-#include <optional>
-
 #include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_double4.hpp>
 #include <raylib.h>
 
 #include "body.hpp"
-
-enum Side {
-    Top,
-    Bottom,
-    Left,
-    Right,
-};
 
 class AABoundingBox
 {
@@ -26,7 +18,7 @@ class AABoundingBox
     AABoundingBox(glm::dvec2 position, double width, double height);
     bool isCollidingAABB(const AABoundingBox& other);
 
-    std::optional<Side> findBodyCrossingSide(const Body& body);
+    glm::dvec4 findBodyCrossingError(const Body& body);
 
     void debugDraw(Color color) const noexcept;
 

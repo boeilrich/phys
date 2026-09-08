@@ -8,6 +8,7 @@
 
 #include <glm/ext/vector_double2.hpp>
 #include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_double4.hpp>
 #include <glm/geometric.hpp>
 #include <raylib.h>
 
@@ -20,48 +21,46 @@ constexpr double RESTITUTION = 0.8;
 void Simulation::tick()
 {
     for (auto& body : bodies_) {
-        body.applyAcceleration(glm::dvec2(0.0, -9.81));
+        body.tick(TIMESTEP);
     }
 
     for (auto& body : bodies_) {
-        body.tick(TIMESTEP);
-        processBoundaryConstraint(body);
+        body.applyAcceleration(glm::dvec2(0.0, -9.81));
     }
 
-    processBodyCollisions();
+    for (unsigned int i = 0; i < 8; i++) {
+        for (auto& body : bodies_) {
+            processBoundaryConstraint(body);
+        }
+        processBodyCollisions();
+    }
 }
 
 void Simulation::processBoundaryConstraint(Body& body)
 {
-    glm::dvec2 area_position = area_.getPosition();
-    double area_height = area_.getHeight();
-    double area_width = area_.getWidth();
-
-    double radius = body.getRadius();
     glm::dvec2 position = body.getPosition();
     glm::dvec2 velocity = body.getVelocity();
 
-    std::optional<Side> side = area_.findBodyCrossingSide(body);
-    if (!side)
-        return;
+    glm::dvec4 error = area_.findBodyCrossingError(body);
 
-    switch (*side) {
-        case Side::Top:
-            velocity.y = -velocity.y * DAMPENING_FACTOR;
-            position.y = (area_position.y + area_height / 2.0) - radius;
-            break;
-        case Side::Bottom:
-            velocity.y = -velocity.y * DAMPENING_FACTOR;
-            position.y = (area_position.y - area_height / 2.0) + radius;
-            break;
-        case Side::Left:
-            velocity.x = -velocity.x * DAMPENING_FACTOR;
-            position.x = (area_position.x - area_width / 2.0) + radius;
-            break;
-        case Side::Right:
-            velocity.x = -velocity.x * DAMPENING_FACTOR;
-            position.x = (area_position.x + area_width / 2.0) - radius;
-            break;
+    if (error.x > 0) {
+        velocity.x = -velocity.x * DAMPENING_FACTOR;
+        position.x = position.x + error.x;
+    }
+
+    if (error.y > 0) {
+        velocity.x = -velocity.x * DAMPENING_FACTOR;
+        position.x = position.x - error.y;
+    }
+
+    if (error.z > 0) {
+        velocity.y = -velocity.y * DAMPENING_FACTOR;
+        position.y = position.y + error.z;
+    }
+
+    if (error.w > 0) {
+        velocity.y = -velocity.y * DAMPENING_FACTOR;
+        position.y = position.y - error.w;
     }
 
     body.setVelocity(velocity);
@@ -76,36 +75,38 @@ void Simulation::processBodyCollisions()
                 continue;
             }
 
-            glm::dvec2 delta = (*body1_it).getPosition() - (*body2_it).getPosition();
+            Body& body1 = *body1_it;
+            Body& body2 = *body2_it;
 
-            double distance = glm::length(delta);
+            glm::dvec2 delta_position = body1.getPosition() - body2.getPosition();
+            double distance = glm::length(delta_position);
 
-            if (distance > (*body1_it).getRadius() + (*body2_it).getRadius() || distance == 0) {
+            if (distance == 0 || body1.getRadius() + body2.getRadius() < distance) {
                 continue;
             }
 
-            double depth = ((*body1_it).getRadius() + (*body2_it).getRadius() - distance);
+            glm::dvec2 normal = glm::normalize(delta_position);
+            double collision_depth = body1.getRadius() + (body2.getRadius() - distance);
 
-            glm::dvec2 collision_normal = glm::normalize(delta);
+            glm::dvec2 relative_velocity = body1.getVelocity() - body2.getVelocity();
+            double velocity_along_normal = glm::dot(relative_velocity, normal);
 
-            glm::dvec2 relativeVelocity = (*body1_it).getVelocity() - (*body2_it).getVelocity();
-            double velocityAlongNormal = glm::dot(relativeVelocity, collision_normal);
-
-            if (velocityAlongNormal >= 0.0)
+            if (velocity_along_normal >= 0.0) {
                 continue;
+            }
 
-            double inverseMass1 = 1.0 / (*body1_it).getMass();
-            double inverseMass2 = 1.0 / (*body2_it).getMass();
+            double inverse_mass1 = 1.0 / body1.getMass();
+            double inverse_mass2 = 1.0 / body2.getMass();
 
-            double impulseMagnitude = -(1.0 + RESTITUTION) * velocityAlongNormal / (inverseMass1 + inverseMass2);
+            double impulse_magnitude = -(1.0 + RESTITUTION) * velocity_along_normal / (inverse_mass1 + inverse_mass2);
 
-            glm::dvec2 impulse = impulseMagnitude * collision_normal;
+            glm::dvec2 impulse = impulse_magnitude * normal;
 
-            (*body1_it).setVelocity((*body1_it).getVelocity() + inverseMass1 * impulse);
-            (*body2_it).setVelocity((*body2_it).getVelocity() - inverseMass2 * impulse);
+            body1.setVelocity(body1.getVelocity() + inverse_mass1 * impulse);
+            body2.setVelocity(body2.getVelocity() - inverse_mass2 * impulse);
 
-            (*body1_it).setPosition((*body1_it).getPosition() + collision_normal * depth / 2.0);
-            (*body2_it).setPosition((*body2_it).getPosition() - collision_normal * depth / 2.0);
+            body1.setPosition(body1.getPosition() + normal * collision_depth / 2.0);
+            body2.setPosition(body2.getPosition() - normal * collision_depth / 2.0);
         }
     }
 }
@@ -121,7 +122,7 @@ void Simulation::addRandomBodies(unsigned int count)
 
     std::default_random_engine e1(r());
 
-    std::uniform_real_distribution<double> radius_distribution(0.1, 3);
+    std::uniform_real_distribution<double> radius_distribution(0.1, 2);
     std::uniform_real_distribution<double> acceleration_distribution(100, 500);
     std::uniform_real_distribution<double> color_distribution(0.0, 1.0);
 
