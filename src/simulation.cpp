@@ -1,8 +1,9 @@
 #include "simulation.hpp"
 
+#include <algorithm>
 #include <cmath>
+#include <iterator>
 #include <numbers>
-#include <optional>
 #include <random>
 #include <vector>
 
@@ -15,8 +16,8 @@
 #include "aabb.hpp"
 #include "body.hpp"
 
-constexpr double DAMPENING_FACTOR = 0.8;
-constexpr double RESTITUTION = 0.8;
+constexpr double DAMPENING_FACTOR = 1;
+constexpr double RESTITUTION = 1;
 
 void Simulation::tick()
 {
@@ -41,27 +42,28 @@ void Simulation::processBoundaryConstraint(Body& body)
     glm::dvec2 position = body.getPosition();
     glm::dvec2 velocity = body.getVelocity();
 
-    glm::dvec4 error = area_.findBodyCrossingError(body);
+    CrossingError error = area_.findBodyCrossingError(body);
 
-    if (error.x > 0) {
-        velocity.x = -velocity.x * DAMPENING_FACTOR;
-        position.x = position.x + error.x;
-    }
-
-    if (error.y > 0) {
-        velocity.x = -velocity.x * DAMPENING_FACTOR;
-        position.x = position.x - error.y;
-    }
-
-    if (error.z > 0) {
+    if (error.top > 0 && velocity.y > 0.0) {
         velocity.y = -velocity.y * DAMPENING_FACTOR;
-        position.y = position.y + error.z;
     }
 
-    if (error.w > 0) {
+    if (error.bottom > 0 && velocity.y < 0.0) {
         velocity.y = -velocity.y * DAMPENING_FACTOR;
-        position.y = position.y - error.w;
     }
+
+    if (error.left > 0 && velocity.x < 0.0) {
+        velocity.x = -velocity.x * DAMPENING_FACTOR;
+    }
+
+    if (error.right > 0 && velocity.x > 0.0) {
+        velocity.x = -velocity.x * DAMPENING_FACTOR;
+    }
+
+    position.y = position.y - std::max(error.top, 0.0);
+    position.y = position.y + std::max(error.bottom, 0.0);
+    position.x = position.x + std::max(error.left, 0.0);
+    position.x = position.x - std::max(error.right, 0.0);
 
     body.setVelocity(velocity);
     body.setPosition(position);
@@ -78,16 +80,27 @@ void Simulation::processBodyCollisions()
             Body& body1 = *body1_it;
             Body& body2 = *body2_it;
 
+            // Positional correction of the two bodies
             glm::dvec2 delta_position = body1.getPosition() - body2.getPosition();
             double distance = glm::length(delta_position);
+            double minimum_distance = body1.getRadius() + body2.getRadius();
 
-            if (distance == 0 || body1.getRadius() + body2.getRadius() < distance) {
+            if (distance >= minimum_distance) {
                 continue;
             }
 
-            glm::dvec2 normal = glm::normalize(delta_position);
+            glm::dvec2 normal = (distance > 0.0) ? glm::normalize(delta_position) : glm::dvec2(1.0, 0.0);
             double collision_depth = body1.getRadius() + (body2.getRadius() - distance);
 
+            double inverse_mass1 = 1.0 / body1.getMass();
+            double inverse_mass2 = 1.0 / body2.getMass();
+
+            double total_inverse_mass = inverse_mass1 + inverse_mass2;
+
+            body1.setPosition(body1.getPosition() + normal * collision_depth * (inverse_mass1 / total_inverse_mass));
+            body2.setPosition(body2.getPosition() - normal * collision_depth * (inverse_mass2 / total_inverse_mass));
+
+            // Velocity correction
             glm::dvec2 relative_velocity = body1.getVelocity() - body2.getVelocity();
             double velocity_along_normal = glm::dot(relative_velocity, normal);
 
@@ -95,18 +108,12 @@ void Simulation::processBodyCollisions()
                 continue;
             }
 
-            double inverse_mass1 = 1.0 / body1.getMass();
-            double inverse_mass2 = 1.0 / body2.getMass();
-
             double impulse_magnitude = -(1.0 + RESTITUTION) * velocity_along_normal / (inverse_mass1 + inverse_mass2);
 
             glm::dvec2 impulse = impulse_magnitude * normal;
 
             body1.setVelocity(body1.getVelocity() + inverse_mass1 * impulse);
             body2.setVelocity(body2.getVelocity() - inverse_mass2 * impulse);
-
-            body1.setPosition(body1.getPosition() + normal * collision_depth / 2.0);
-            body2.setPosition(body2.getPosition() - normal * collision_depth / 2.0);
         }
     }
 }

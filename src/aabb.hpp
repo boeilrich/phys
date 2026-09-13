@@ -6,6 +6,13 @@
 
 #include "body.hpp"
 
+using CrossingError = struct CrossingError {
+    double top{};
+    double bottom{};
+    double left{};
+    double right{};
+};
+
 class AABoundingBox
 {
   private:
@@ -18,7 +25,7 @@ class AABoundingBox
     AABoundingBox(glm::dvec2 position, double width, double height);
     bool isCollidingAABB(const AABoundingBox& other);
 
-    glm::dvec4 findBodyCrossingError(const Body& body);
+    CrossingError findBodyCrossingError(const Body& body);
 
     void debugDraw(Color color) const noexcept;
 

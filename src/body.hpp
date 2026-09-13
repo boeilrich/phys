@@ -10,7 +10,7 @@ class Body
     double mass_;
     double radius_;
 
-    Color color_;
+    Color color_{};
 
     glm::dvec2 position_{};
     glm::dvec2 velocity_{};

@@ -30,6 +30,7 @@ int main()
         auto render_start = std::chrono::high_resolution_clock::now();
 
         const std::vector<Body>& bodies = simulation->getBodies();
+
         BeginDrawing();
         ClearBackground(BLACK);
         for (auto body : bodies) {

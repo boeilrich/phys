@@ -1,7 +1,5 @@
 #include "aabb.hpp"
 
-#include <optional>
-
 #include <glm/ext/vector_double2.hpp>
 #include <glm/ext/vector_double4.hpp>
 #include <raylib.h>
@@ -22,17 +20,17 @@ bool AABoundingBox::isCollidingAABB(const AABoundingBox& other)
            (position_.y + height_ / 2.0 >= other.position_.y - other.height_ / 2.0);
 }
 
-glm::dvec4 AABoundingBox::findBodyCrossingError(const Body& body)
+CrossingError AABoundingBox::findBodyCrossingError(const Body& body)
 {
     const auto position = body.getPosition();
     const auto radius = body.getRadius();
 
-    glm::dvec4 error{};
+    CrossingError error{};
 
-    error.x = (position_.x - width_ / 2.0) - (position.x - radius);   // left side
-    error.y = (position.x + radius) - (position_.x + width_ / 2.0);   // right side
-    error.z = (position_.y - height_ / 2.0) - (position.y - radius);  // bottom side
-    error.w = (position.y + radius) - (position_.y + height_ / 2.0);  // top side
+    error.top = (position.y + radius) - (position_.y + height_ / 2.0);     // top side
+    error.bottom = (position_.y - height_ / 2.0) - (position.y - radius);  // bottom side
+    error.left = (position_.x - width_ / 2.0) - (position.x - radius);     // left side
+    error.right = (position.x + radius) - (position_.x + width_ / 2.0);    // right side
 
     return error;
 }
