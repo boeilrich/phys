@@ -14,10 +14,10 @@
 #include <raylib.h>
 
 #include "aabb.hpp"
-#include "body.hpp"
+#include "circle.hpp"
 
-constexpr double DAMPENING_FACTOR = 1;
-constexpr double RESTITUTION = 1;
+constexpr double DAMPENING_FACTOR = 0.9;
+constexpr double RESTITUTION = 0.9;
 
 void Simulation::tick()
 {
@@ -30,14 +30,14 @@ void Simulation::tick()
     }
 
     for (unsigned int i = 0; i < 8; i++) {
+        processBodyCollisions();
         for (auto& body : bodies_) {
             processBoundaryConstraint(body);
         }
-        processBodyCollisions();
     }
 }
 
-void Simulation::processBoundaryConstraint(Body& body)
+void Simulation::processBoundaryConstraint(Circle& body)
 {
     glm::dvec2 position = body.getPosition();
     glm::dvec2 velocity = body.getVelocity();
@@ -73,12 +73,8 @@ void Simulation::processBodyCollisions()
 {
     for (auto body1_it = bodies_.begin(); body1_it != bodies_.end(); ++body1_it) {
         for (auto body2_it = std::next(body1_it); body2_it != bodies_.end(); ++body2_it) {
-            if (body1_it == body2_it) {
-                continue;
-            }
-
-            Body& body1 = *body1_it;
-            Body& body2 = *body2_it;
+            Circle& body1 = *body1_it;
+            Circle& body2 = *body2_it;
 
             // Positional correction of the two bodies
             glm::dvec2 delta_position = body1.getPosition() - body2.getPosition();
@@ -108,7 +104,12 @@ void Simulation::processBodyCollisions()
                 continue;
             }
 
-            double impulse_magnitude = -(1.0 + RESTITUTION) * velocity_along_normal / (inverse_mass1 + inverse_mass2);
+            double impulse_magnitude = 0;
+            if (-velocity_along_normal >= -0.5) {
+                impulse_magnitude = -(1.0 + 0) * velocity_along_normal / (inverse_mass1 + inverse_mass2);
+            } else {
+                impulse_magnitude = -(1.0 + RESTITUTION) * velocity_along_normal / (inverse_mass1 + inverse_mass2);
+            }
 
             glm::dvec2 impulse = impulse_magnitude * normal;
 
@@ -118,7 +119,7 @@ void Simulation::processBodyCollisions()
     }
 }
 
-void Simulation::addBody(Body body)
+void Simulation::addBody(Circle body)
 {
     bodies_.push_back(body);
 }
@@ -130,14 +131,14 @@ void Simulation::addRandomBodies(unsigned int count)
     std::default_random_engine e1(r());
 
     std::uniform_real_distribution<double> radius_distribution(0.1, 2);
-    std::uniform_real_distribution<double> acceleration_distribution(100, 500);
+    std::uniform_real_distribution<double> acceleration_distribution(-500, 500);
     std::uniform_real_distribution<double> color_distribution(0.0, 1.0);
 
-    std::uniform_real_distribution<double> x_distribution(area_.getPosition().x - area_.getWidth(),
-                                                          area_.getPosition().x + area_.getWidth());
+    std::uniform_real_distribution<double> x_distribution(area_.getPosition().x - area_.getWidth() / 2,
+                                                          area_.getPosition().x + area_.getWidth() / 2);
 
-    std::uniform_real_distribution<double> y_distribution(area_.getPosition().y - area_.getHeight(),
-                                                          area_.getPosition().y + area_.getHeight());
+    std::uniform_real_distribution<double> y_distribution(area_.getPosition().y - area_.getHeight() / 2,
+                                                          area_.getPosition().y + area_.getHeight() / 2);
 
     for (unsigned int i = 0; i < count; i++) {
         double x = x_distribution(e1);
@@ -155,7 +156,7 @@ const AABoundingBox& Simulation::getBoundingBox()
     return area_;
 }
 
-const std::vector<Body>& Simulation::getBodies() const noexcept
+const std::vector<Circle>& Simulation::getBodies() const noexcept
 {
     return bodies_;
 }

@@ -1,9 +1,9 @@
-#include "body.hpp"
+#include "circle.hpp"
 
 #include <glm/ext/vector_double2.hpp>
 #include <raylib.h>
 
-void Body::tick(double dt)
+void Circle::tick(double dt)
 {
     velocity_ += accumulated_acceleration_ * dt;
     accumulated_acceleration_ = {};
@@ -11,47 +11,47 @@ void Body::tick(double dt)
     position_ += velocity_ * dt;
 }
 
-void Body::applyAcceleration(glm::dvec2 acceleration)
+void Circle::applyAcceleration(glm::dvec2 acceleration)
 {
     accumulated_acceleration_ += acceleration;
 }
 
-void Body::applyForce(glm::dvec2 force)
+void Circle::applyForce(glm::dvec2 force)
 {
     accumulated_acceleration_ += force / mass_;
 }
 
-void Body::setVelocity(glm::dvec2 velocity)
+void Circle::setVelocity(glm::dvec2 velocity)
 {
     velocity_ = velocity;
 }
 
-void Body::setPosition(glm::dvec2 position)
+void Circle::setPosition(glm::dvec2 position)
 {
     position_ = position;
 }
 
-double Body::getMass() const noexcept
+double Circle::getMass() const noexcept
 {
     return mass_;
 }
 
-double Body::getRadius() const noexcept
+double Circle::getRadius() const noexcept
 {
     return radius_;
 }
 
-glm::dvec2 Body::getPosition() const noexcept
+glm::dvec2 Circle::getPosition() const noexcept
 {
     return position_;
 }
 
-glm::dvec2 Body::getVelocity() const noexcept
+glm::dvec2 Circle::getVelocity() const noexcept
 {
     return velocity_;
 }
 
-Color Body::getColor() const noexcept
+Color Circle::getColor() const noexcept
 {
     return color_;
 }

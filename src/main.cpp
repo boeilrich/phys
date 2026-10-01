@@ -4,12 +4,11 @@
 #include <print>
 #include <ratio>
 #include <thread>
-#include <vector>
 
 #include <glm/ext/vector_double2.hpp>
 #include <raylib.h>
 
-#include "body.hpp"
+#include "circle.hpp"
 #include "simulation.hpp"
 #include "util.hpp"
 
@@ -17,7 +16,7 @@ int main()
 {
     Simulation* simulation = new Simulation();
 
-    simulation->addRandomBodies(20);
+    simulation->addRandomBodies(40);
 
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(WIDTH, HEIGHT, "phys");
@@ -29,7 +28,7 @@ int main()
 
         auto render_start = std::chrono::high_resolution_clock::now();
 
-        const std::vector<Body>& bodies = simulation->getBodies();
+        const std::vector<Circle>& bodies = simulation->getBodies();
 
         BeginDrawing();
         ClearBackground(BLACK);

@@ -4,7 +4,7 @@
 #include <glm/ext/vector_double4.hpp>
 #include <raylib.h>
 
-#include "body.hpp"
+#include "circle.hpp"
 
 using CrossingError = struct CrossingError {
     double top{};
@@ -25,7 +25,7 @@ class AABoundingBox
     AABoundingBox(glm::dvec2 position, double width, double height);
     bool isCollidingAABB(const AABoundingBox& other);
 
-    CrossingError findBodyCrossingError(const Body& body);
+    CrossingError findBodyCrossingError(const Circle& body);
 
     void debugDraw(Color color) const noexcept;
 

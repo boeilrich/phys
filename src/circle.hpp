@@ -4,7 +4,7 @@
 #include <glm/ext/vector_double3.hpp>
 #include <raylib.h>
 
-class Body
+class Circle
 {
   private:
     double mass_;
@@ -17,7 +17,7 @@ class Body
     glm::dvec2 accumulated_acceleration_{};
 
   public:
-    Body(glm::dvec2 position, double mass, double radius, glm::dvec3 color)
+    Circle(glm::dvec2 position, double mass, double radius, glm::dvec3 color)
         : mass_(mass),
           radius_(radius),
           position_(position)

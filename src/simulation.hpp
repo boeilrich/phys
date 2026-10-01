@@ -5,7 +5,7 @@
 #include <glm/ext/vector_double2.hpp>
 
 #include "aabb.hpp"
-#include "body.hpp"
+#include "circle.hpp"
 
 constexpr double GRAVITATIONAL_CONSTANT = 0.0000000000667430;
 constexpr double TIMESTEP = 1.0 / 60.0;
@@ -13,20 +13,20 @@ constexpr double TIMESTEP = 1.0 / 60.0;
 class Simulation
 {
   private:
-    std::vector<Body> bodies_;
+    std::vector<Circle> bodies_;
 
     AABoundingBox area_{glm::dvec2(0.0, 0.0), 20, 20};
 
-    void processBoundaryConstraint(Body& body);
+    void processBoundaryConstraint(Circle& body);
     void processBodyCollisions();
 
   public:
     void tick();
 
-    void addBody(Body body);
+    void addBody(Circle body);
     void addRandomBodies(unsigned int count);
 
     const AABoundingBox& getBoundingBox();
 
-    const std::vector<Body>& getBodies() const noexcept;
+    const std::vector<Circle>& getBodies() const noexcept;
 };

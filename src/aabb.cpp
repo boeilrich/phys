@@ -4,7 +4,7 @@
 #include <glm/ext/vector_double4.hpp>
 #include <raylib.h>
 
-#include "body.hpp"
+#include "circle.hpp"
 #include "util.hpp"
 
 AABoundingBox::AABoundingBox(glm::dvec2 position, double width, double height)
@@ -20,7 +20,7 @@ bool AABoundingBox::isCollidingAABB(const AABoundingBox& other)
            (position_.y + height_ / 2.0 >= other.position_.y - other.height_ / 2.0);
 }
 
-CrossingError AABoundingBox::findBodyCrossingError(const Body& body)
+CrossingError AABoundingBox::findBodyCrossingError(const Circle& body)
 {
     const auto position = body.getPosition();
     const auto radius = body.getRadius();
